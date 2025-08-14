@@ -1,6 +1,7 @@
 {
   "name": "ts-scaffold",
   "version": "1.0.0",
+  "type": "module",
   "description": "Minimal TypeScript scaffold with watch mode",
   "main": "dist/index.js",
   "scripts": {
