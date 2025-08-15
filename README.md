@@ -28,20 +28,7 @@ TypeScript + React starter for frontend prototyping.
 2. Click **Code → Download ZIP**.  
 3. Extract it anywhere. You now have a standalone project.
 
-### Option 2: Use `git archive` (CLI)
+### Option 2: Detached CLI Copy
 ```bash
-git archive --remote=https://github.com/your-username/scaffold.git <branch-name> | tar -x -C my-project
-````
-
-* Replace `<branch-name>` with `typescript`, `ts-module`, or `react`.
-* `my-project` is the folder where you want the scaffold.
-* The resulting project is **completely detached** from the original repo.
-
----
-
-## Notes
-
-* Each branch is self-contained.
-* Ideal for quick prototyping or starting new projects fast.
-* No further Git connection is required.
-
+git clone --branch <branch-name> --single-branch https://github.com/SingleDraw/scaffold.git temp && shopt -s dotglob && mv temp/* . && cd . && rm -rf temp
+```
