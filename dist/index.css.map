@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../src/global.css"],
+  "sourcesContent": [":root {\r\n    --primary-color: #00d4aa;\r\n    --secondary-color: #0099cc;\r\n    --background-color: #0f0f0f;\r\n    --text-color: #fff;\r\n}\r\n\r\nhtml {\r\n    scroll-behavior: smooth;\r\n}\r\n\r\nbody {\r\n    font-family: 'Segoe UI', system-ui, sans-serif;\r\n    padding: 20px;\r\n    background: #0f0f0f;\r\n    color: #fff;\r\n}"],
+  "mappings": ";AAAA;AACI,mBAAiB;AACjB,qBAAmB;AACnB,sBAAoB;AACpB,gBAAc;AAClB;AAEA;AACI,mBAAiB;AACrB;AAEA;AACI;AAAA,IAAa,UAAU;AAAA,IAAE,SAAS;AAAA,IAAE;AACpC,WAAS;AACT,cAAY;AACZ,SAAO;AACX;",
+  "names": []
+}
