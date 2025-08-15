@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import './global.css';
 
 interface CounterButtonProps {
   count: number;

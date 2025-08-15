@@ -2,6 +2,8 @@ const esbuild = require('esbuild');
 const path = require('path');
 const fs = require('fs');
 const http = require('http');
+const postCssPlugin = require('esbuild-plugin-postcss').default;
+
 
 const isDev = process.argv.includes('--dev');
 
@@ -14,7 +16,7 @@ function watchFiles(callback) {
       const fullPath = path.join(dir, dirent.name);
       if (dirent.isDirectory()) {
         watch(fullPath);
-      } else if (dirent.isFile() && /\.(ts|tsx|js|jsx)$/.test(dirent.name)) {
+      } else if (dirent.isFile() && /\.(ts|tsx|js|jsx|css)$/.test(dirent.name)) {
         fs.watchFile(fullPath, { interval: 100 }, callback);
       }
     });
@@ -104,6 +106,7 @@ async function build() {
       '.jsx': 'jsx',
       '.ts': 'ts',
       '.tsx': 'tsx',
+      '.css': 'css',
     },
     jsx: 'automatic',
     define: {
@@ -130,6 +133,7 @@ async function build() {
 })();
       `
     } : {},
+    plugins: [postCssPlugin()],
   };
 
   if (isDev) {
