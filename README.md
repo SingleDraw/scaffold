@@ -4,12 +4,11 @@ A minimal React starter project with TypeScript, esbuild and Hot Module Replacem
 
 ## Features
 
-- ⚡ Lightning fast builds with esbuild
-- 🔥 Hot Module Replacement (HMR) for instant development feedback
-- 📦 Minimal setup with no complex configuration
-- 🚀 Production-ready builds
-- 💪 Full TypeScript support with strict type checking
-- 🎯 Modern React 18 with automatic JSX transform
+- Fast builds with esbuild
+- Hot Module Replacement (HMR) for instant development feedback
+- Minimal setup with no complex configuration
+- Full TypeScript support with strict type checking
+- Modern React 18 with automatic JSX transform
 
 ## Getting Started
 
