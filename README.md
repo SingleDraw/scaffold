@@ -30,5 +30,5 @@ TypeScript + React starter for frontend prototyping.
 
 ### Option 2: Detached CLI Copy
 ```bash
-git clone --branch <branch-name> --single-branch https://github.com/SingleDraw/scaffold.git temp && shopt -s dotglob && mv temp/* . && cd . && rm -rf temp
+git clone --branch <branch-name> --single-branch https://github.com/SingleDraw/scaffold.git . && rm -rf .git
 ```
