@@ -1,21 +1,24 @@
 {
-  "name": "ts-scaffold",
+  "name": "react-esbuild-starter",
   "version": "1.0.0",
-  "type": "module",
-  "description": "Minimal TypeScript scaffold with watch mode",
-  "main": "dist/index.js",
+  "description": "Minimal React starter with esbuild and HMR",
+  "main": "src/index.tsx",
   "scripts": {
-    "build": "tsc",
-    "dev": "tsx watch src/index.ts",
-    "start": "node dist/index.js",
-    "clean": "rm -rf dist"
+    "dev": "node build.js --dev",
+    "build": "node build.js",
+    "preview": "npx serve dist"
   },
-  "keywords": ["typescript", "scaffold"],
+  "keywords": ["react", "esbuild", "hmr", "starter"],
   "author": "",
   "license": "MIT",
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
   "devDependencies": {
-    "@types/node": "^20.0.0",
-    "tsx": "^4.0.0",
-    "typescript": "^5.3.0"
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "esbuild": "^0.19.0",
+    "typescript": "^5.0.0"
   }
 }
