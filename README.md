@@ -19,6 +19,10 @@ TypeScript setup compiled to **ES Modules**.
 TypeScript + React starter for frontend prototyping.  
 **Branch:** `react`  
 
+### 4. FastAPI
+basic FastAPI starter for backend request api prototyping.
+**Branch:** `fastapi`
+
 ---
 
 ## Quick Usage (Detached from Repo)
