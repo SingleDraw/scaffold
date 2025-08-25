@@ -1,0 +1,1 @@
+Test file to send with request by the client.

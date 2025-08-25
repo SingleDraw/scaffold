@@ -1,79 +1,84 @@
-# React Esbuild TypeScript Starter
+# FastAPI Request Logger Starter
 
-A minimal React starter project with TypeScript, esbuild and Hot Module Replacement (HMR).
+A simple FastAPI service that logs and processes HTTP requests with files, form data, headers, and cookies.
 
 ## Features
 
-- Fast builds with esbuild
-- Hot Module Replacement (HMR) for instant development feedback
-- Minimal setup with no complex configuration
-- Full TypeScript support with strict type checking
-- Modern React 18 with automatic JSX transform
+- Process JSON, form data, and file uploads
+- Log request details (headers, cookies, files, form params)
+- Docker support with volume mounting
+- Basic health check endpoint
 
 ## Getting Started
 
 1. **Install dependencies:**
    ```bash
-   npm install
+   pip install -r requirements.txt
    ```
 
 2. **Start development server:**
    ```bash
-   npm run dev
+   uvicorn app.main:app --reload --host 0.0.0.0 --port 8003
    ```
-   This will start the development server at `http://localhost:3000` with HMR enabled.
+   Server runs at `http://localhost:8003`
 
-3. **Build for production:**
+3. **Test the service:**
    ```bash
-   npm run build
+   python client_test.py
    ```
 
-4. **Preview production build:**
-   ```bash
-   npm run preview
-   ```
+## Docker Usage
+
+```bash
+# Build image
+docker build -t my-fastapi-app .
+
+# Run with volume mounting
+docker run -v ./host_sink:/app/sink -p 8003:8003 my-fastapi-app
+```
+
+## API Endpoints
+
+### `POST /process`
+Main endpoint that accepts:
+- File uploads (single `file` or multiple `files`)
+- Form data (`param1`, `param2`)
+- Headers and cookies
+- JSON or raw body data
+
+### `GET /health`
+Returns `{"status": "ok"}`
+
+### `GET /debug`
+Shows configured sink directory
 
 ## Project Structure
 
 ```
-react-esbuild-starter/
-├── src/
-│   ├── index.tsx         # Entry point
-│   └── App.tsx           # Main App component
-├── dist/
-│   └── index.html        # HTML template
-├── build.js              # Esbuild configuration
-├── tsconfig.json         # TypeScript configuration
-├── package.json
+fastapi-logger/
+├── app/
+│   ├── api/
+│   │   └── routes.py          # API routes
+│   ├── services/
+│   │   └── example_logger.py  # Logging service
+│   ├── config.py              # App configuration
+│   └── main.py                # FastAPI app
+├── host_sink/                 # Log output directory
+├── client_test.py             # Test client
+├── Dockerfile
+├── requirements.txt
 └── README.md
 ```
 
 ## Development
 
-- Edit files in the `src/` directory
-- Changes are automatically reflected in the browser thanks to HMR
-- TypeScript provides full intellisense and compile-time error checking
-- The development server provides sourcemaps for easier debugging
+- Edit routes in `app/api/routes.py`
+- Modify logging in `app/services/example_logger.py`
+- Configure settings in `app/config.py`
+- All requests are logged to the sink directory
+- Use `client_test.py` to test different request types
 
-## TypeScript Configuration
+## Configuration
 
-The project uses a strict TypeScript configuration with:
-- Strict type checking enabled
-- Modern ES2020 target
-- React 18 JSX transform (no need to import React)
-- Full DOM and ES6 lib support
-
-## Customization
-
-The build configuration is in `build.js`. Key features:
-- Automatic TypeScript compilation
-- JSX automatic transform (React 17+)
-- Development vs production optimizations
-- Hot module replacement in development
-
-You can modify:
-- Entry points
-- Output directory
-- Build targets
-- TypeScript compiler options in `tsconfig.json`
-- Additional esbuild options
+Set environment variables:
+- `PORT`: Server port (default: 8003)
