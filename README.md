@@ -1,4 +1,4 @@
-# FastAPI Request Logger Starter
+# FastAPI Starter
 
 A simple FastAPI scaffold with auth middleware, logging and handling HTTP requests with files, form data, headers, and cookies.
 
