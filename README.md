@@ -1,6 +1,6 @@
 # FastAPI Request Logger Starter
 
-A simple FastAPI service that logs and processes HTTP requests with files, form data, headers, and cookies.
+A simple FastAPI scaffold with auth middleware, logging and handling HTTP requests with files, form data, headers, and cookies.
 
 ## Features
 

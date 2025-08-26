@@ -1,12 +1,12 @@
 import datetime
-from fastapi import APIRouter, File, UploadFile, Form, Header, Cookie, Request, HTTPException
+import json
+from fastapi import APIRouter, File, UploadFile, Form, Header, Cookie, Request, HTTPException #, Response
+from fastapi.responses import JSONResponse
 from typing import Optional, List
 from app.services import append_debug_log
 
 
-
 router = APIRouter()
-
 
 
 @router.post("/process")
@@ -78,8 +78,7 @@ async def process_request(
         # Append log entry to debug log
         append_debug_log(log_entry)
 
-
-        return {
+        data = {
             "message": "Request processed",
             "logged": True,
             "files": file_info,
@@ -90,6 +89,27 @@ async def process_request(
             "x_custom_header": x_custom_header,
             "session_id": session_id,
         }
+
+        response = JSONResponse(content=data, status_code=200)
+        # response = Response(content=json.dumps(data), media_type="application/json", status_code=200)
+
+        # Set httponly cookie
+        response.set_cookie(
+            key="session_id", 
+            value="abc123", 
+            httponly=True,  # no js access
+            secure=True,    # https
+            samesite="Lax"  # same-site cookie, Lax|Strict|None 
+        )
+
+        # Set additional cookies if needed
+        response.set_cookie(
+            key="theme",
+            value="dark",
+            httponly=False,  # js access allowed
+        )
+
+        return response
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error processing request: {str(e)}")
