@@ -20,7 +20,7 @@ TypeScript + React starter for frontend prototyping.
 **Branch:** `react`  
 
 ### 4. FastAPI
-basic FastAPI starter for backend request api prototyping.
+basic FastAPI starter for backend request api prototyping.  
 **Branch:** `fastapi`
 
 ---
