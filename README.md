@@ -59,15 +59,17 @@ fastapi-logger/
 ├── app/
 │   ├── api/
 │   │   └── routes.py          # API routes
+│   ├── middleware/
+│   │   └── auth.py            # Auth middleware
 │   ├── services/
 │   │   └── example_logger.py  # Logging service
 │   ├── config.py              # App configuration
 │   └── main.py                # FastAPI app
-├── host_sink/                 # Log output directory
 ├── client_test.py             # Test client
 ├── Dockerfile
+├── README.md
 ├── requirements.txt
-└── README.md
+└── uvicorn_app.sh
 ```
 
 ## Development
