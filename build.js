@@ -2,61 +2,105 @@ const esbuild = require('esbuild');
 const path = require('path');
 const fs = require('fs');
 const http = require('http');
-const postCssPlugin = require('esbuild-plugin-postcss').default;
-
 
 const isDev = process.argv.includes('--dev');
 
-// Simple file watcher
+// Manual CSS modules plugin that definitely works
+const cssModulesPlugin = {
+  name: 'css-modules-manual',
+  setup(build) {
+    const cssChunks = [];
+    
+    build.onLoad({ filter: /\.module\.scss$/ }, async (args) => {
+      console.log(' Loading CSS module:', args.path);
+      
+      let css = await fs.promises.readFile(args.path, 'utf8');
+      console.log(' Original SCSS:', css);
+      
+      // Compile SCSS to CSS
+      const sass = require('sass');
+      const compiled = sass.compileString(css, {
+        loadPaths: [path.dirname(args.path)]
+      });
+      css = compiled.css;
+      console.log(' Compiled CSS:', css);
+      
+      // Generate class mappings
+      const classMap = {};
+      const basename = path.basename(args.path, '.module.scss');
+      
+      const transformedCSS = css.replace(/\.([a-zA-Z][\w-]*)/g, (match, className) => {
+        const scopedName = `${basename}__${className}__${Math.random().toString(36).slice(2, 6)}`;
+        classMap[className] = scopedName;
+        console.log(` Scoped: .${className} -> .${scopedName}`);
+        return `.${scopedName}`;
+      });
+      
+      console.log('Final class mappings:', classMap);
+      console.log('Transformed CSS:', transformedCSS);
+      
+      // Store for extraction
+      cssChunks.push(transformedCSS);
+      
+      return {
+        contents: `export default ${JSON.stringify(classMap)};`,
+        loader: 'js'
+      };
+    });
+    
+    // Write CSS file after build
+    build.onEnd(async () => {
+      if (cssChunks.length > 0) {
+        const finalCSS = cssChunks.join('\n\n/* Next module */\n\n');
+        const cssFile = path.join(build.initialOptions.outdir, 'modules.css');
+        
+        await fs.promises.writeFile(cssFile, finalCSS);
+        console.log('CSS modules extracted to:', cssFile);
+        console.log('Final CSS preview:\n', finalCSS);
+        
+        cssChunks.length = 0;
+      }
+    });
+  }
+};
+
 function watchFiles(callback) {
   const srcDir = path.join(__dirname, 'src');
   
   function watch(dir) {
+    if (!fs.existsSync(dir)) return;
     fs.readdirSync(dir, { withFileTypes: true }).forEach(dirent => {
       const fullPath = path.join(dir, dirent.name);
       if (dirent.isDirectory()) {
         watch(fullPath);
-      } else if (dirent.isFile() && /\.(ts|tsx|js|jsx|css)$/.test(dirent.name)) {
+      } else if (/\.(ts|tsx|js|jsx|css|scss)$/.test(dirent.name)) {
         fs.watchFile(fullPath, { interval: 100 }, callback);
       }
     });
   }
-  
   watch(srcDir);
 }
 
-// Simple HTTP server with live reload
 function createDevServer() {
   const clients = new Set();
   
   const server = http.createServer((req, res) => {
-    // Handle Server-Sent Events for live reload
     if (req.url === '/hmr') {
       res.writeHead(200, {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
         'Connection': 'keep-alive',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Cache-Control'
+        'Access-Control-Allow-Origin': '*'
       });
-      
       clients.add(res);
-      
-      // Send initial connection
       res.write('data: connected\n\n');
-      
-      req.on('close', () => {
-        clients.delete(res);
-      });
-      
+      req.on('close', () => clients.delete(res));
       return;
     }
     
-    // Serve files
-    let filePath = req.url === '/' ? '/index.html' : req.url;
+    const filePath = req.url === '/' ? '/index.html' : req.url;
     const fullPath = path.join(__dirname, 'dist', filePath);
     
-    // Set CORS headers
     res.setHeader('Access-Control-Allow-Origin', '*');
     
     if (fs.existsSync(fullPath)) {
@@ -64,14 +108,8 @@ function createDevServer() {
       const mimeTypes = {
         '.html': 'text/html',
         '.js': 'application/javascript',
-        '.css': 'text/css',
-        '.json': 'application/json',
-        '.png': 'image/png',
-        '.jpg': 'image/jpg',
-        '.gif': 'image/gif',
-        '.svg': 'image/svg+xml'
+        '.css': 'text/css'
       };
-      
       res.setHeader('Content-Type', mimeTypes[ext] || 'text/plain');
       fs.createReadStream(fullPath).pipe(res);
     } else {
@@ -80,18 +118,13 @@ function createDevServer() {
     }
   });
   
-  // Broadcast reload to all clients
-  function broadcast(message) {
-    clients.forEach(client => {
-      try {
-        client.write(`data: ${message}\n\n`);
-      } catch (e) {
-        clients.delete(client);
-      }
-    });
-  }
-  
-  return { server, broadcast };
+  return {
+    server,
+    broadcast: (msg) => clients.forEach(client => {
+      try { client.write(`data: ${msg}\n\n`); }
+      catch (e) { clients.delete(client); }
+    })
+  };
 }
 
 async function build() {
@@ -106,7 +139,8 @@ async function build() {
       '.jsx': 'jsx',
       '.ts': 'ts',
       '.tsx': 'tsx',
-      '.css': 'css',
+      '.css': 'css'
+      // No .scss loader - plugin handles it
     },
     jsx: 'automatic',
     define: {
@@ -115,76 +149,36 @@ async function build() {
     sourcemap: isDev,
     minify: !isDev,
     banner: isDev ? {
-      js: `
-(() => {
-  if (typeof window !== 'undefined') {
-    const eventSource = new EventSource('/hmr');
-    eventSource.onmessage = function(event) {
-      if (event.data === 'reload') {
-        console.log('🔄 Hot reloading...');
-        window.location.reload();
-      }
-    };
-    eventSource.onerror = function() {
-      console.log('HMR connection lost. Retrying...');
-      setTimeout(() => window.location.reload(), 1000);
-    };
-  }
-})();
-      `
+      js: '(() => { if (typeof window !== "undefined") { const es = new EventSource("/hmr"); es.onmessage = (e) => e.data === "reload" && location.reload(); } })();'
     } : {},
-    plugins: [postCssPlugin()],
+    plugins: [cssModulesPlugin],
   };
 
   if (isDev) {
-    // Create development server
     const { server, broadcast } = createDevServer();
-    server.listen(3000, 'localhost', () => {
-      console.log('🚀 Server running at http://localhost:3000');
-      console.log('🔥 Hot Module Replacement enabled');
-    });
+    server.listen(3000, () => console.log('-> http://localhost:3000'));
     
-    // Initial build
-    try {
-      await esbuild.build(buildOptions);
-      console.log('✅ Initial build complete');
-    } catch (error) {
-      console.error('❌ Build error:', error);
-    }
-    
-    // Watch for changes
-    console.log('👀 Watching for changes...');
-    let isBuilding = false;
-    
-    watchFiles(async () => {
-      if (isBuilding) return;
-      isBuilding = true;
-      
+    let building = false;
+    const rebuild = async () => {
+      if (building) return;
+      building = true;
       try {
-        console.log('📝 File changed, rebuilding...');
         await esbuild.build(buildOptions);
-        console.log('✅ Rebuild complete');
+        console.log('Build complete!');
         broadcast('reload');
-      } catch (error) {
-        console.error('❌ Build error:', error);
-      } finally {
-        isBuilding = false;
+      } catch (e) {
+        console.error('ERROR', e.message);
       }
-    });
-
+      building = false;
+    };
+    
+    await rebuild();
+    watchFiles(rebuild);
+    
   } else {
-    // Production build
-    try {
-      await esbuild.build(buildOptions);
-      console.log('✅ Production build complete!');
-    } catch (error) {
-      console.error('❌ Build error:', error);
-      process.exit(1);
-    }
+    await esbuild.build(buildOptions);
+    console.log('Production build complete!');
   }
 }
 
-build().catch((error) => {
-  console.error('❌ Build failed:', error);
-  process.exit(1);
-});
+build().catch(console.error);

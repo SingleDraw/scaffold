@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import './global.css';
+import styles from './App.module.scss';
 
 interface CounterButtonProps {
   count: number;
@@ -9,15 +10,7 @@ interface CounterButtonProps {
 const CounterButton = ({ count, onClick }: CounterButtonProps) => (
   <button 
     onClick={onClick}
-    style={{
-      fontSize: '18px',
-      padding: '10px 20px',
-      backgroundColor: '#007acc',
-      color: 'white',
-      border: 'none',
-      borderRadius: '5px',
-      cursor: 'pointer'
-    }}
+    className={styles.button}
   >
     Count: {count}
   </button>
@@ -32,7 +25,8 @@ function App(): JSX.Element {
 
   return (
     <div style={{ textAlign: 'center', padding: '50px' }}>
-      <h1>React + Esbuild + TypeScript + HMR</h1>
+      <h1>React Scaffold</h1>
+      <h2>Esbuild + TypeScript + HMR + SCSS Modules</h2>
       <div style={{ margin: '20px 0' }}>
         <CounterButton count={count} onClick={handleIncrement} />
       </div>

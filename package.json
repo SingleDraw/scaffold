@@ -8,7 +8,12 @@
     "build": "node build.js",
     "preview": "npx serve dist"
   },
-  "keywords": ["react", "esbuild", "hmr", "starter"],
+  "keywords": [
+    "react",
+    "esbuild",
+    "hmr",
+    "starter"
+  ],
   "author": "",
   "license": "MIT",
   "dependencies": {
@@ -18,8 +23,12 @@
   "devDependencies": {
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
-    "esbuild": "^0.19.0",
+    "autoprefixer": "^10.4.21",
+    "esbuild": "^0.25.9",
     "esbuild-plugin-postcss": "^0.3.0",
+    "postcss": "^8.5.6",
+    "postcss-modules": "^6.0.1",
+    "sass": "^1.91.0",
     "typescript": "^5.0.0"
   }
 }
